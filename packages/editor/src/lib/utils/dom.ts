@@ -1,10 +1,10 @@
 /*
 This is used to facilitate double clicking and pointer capture on elements.
 
-The events in this file are possibly set on individual SVG elements, 
-such as handles or corner handles, rather than on HTML elements or 
+The events in this file are possibly set on individual SVG elements,
+such as handles or corner handles, rather than on HTML elements or
 SVGSVGElements. Raw SVG elements do not support pointerCapture in
-most cases, meaning that in order for pointer capture to work, we 
+most cases, meaning that in order for pointer capture to work, we
 need to crawl up the DOM tree to find the nearest HTML element. Then,
 in order for that element to also call the `onPointerUp` event from
 this file, we need to manually set that event on that element and
@@ -140,6 +140,31 @@ export function getGlobalDocument(): Document {
 export function getGlobalWindow(): Window & typeof globalThis {
 	if (typeof window !== 'undefined') return window as Window & typeof globalThis
 	return globalThis as Window & typeof globalThis
+}
+
+/**
+ * Registers a `change` listener on a {@link MediaQueryList}, feature-detecting
+ * the available API.
+ *
+ * Some embedded browsers and WebViews return a `MediaQueryList` that lacks the
+ * standard `addEventListener`/`removeEventListener` methods, exposing only the
+ * deprecated `addListener`/`removeListener` API, so we detect the supported API
+ * and fall back gracefully.
+ *
+ * @internal
+ */
+export function addMediaQueryChangeListener(
+	mql: MediaQueryList,
+	listener: (this: MediaQueryList, ev: MediaQueryListEvent) => void
+) {
+	if (typeof mql.addEventListener === 'function') {
+		mql.addEventListener('change', listener)
+		// oxlint-disable-next-line typescript/no-deprecated
+	} else if (typeof mql.addListener === 'function') {
+		// Deprecated fallback for older/embedded browsers that only support addListener.
+		// oxlint-disable-next-line typescript/no-deprecated
+		mql.addListener(listener)
+	}
 }
 
 /** @internal */

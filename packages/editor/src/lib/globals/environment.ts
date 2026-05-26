@@ -1,5 +1,5 @@
 import { atom } from '@tldraw/state'
-import { getGlobalWindow } from '../utils/dom'
+import { addMediaQueryChangeListener, getGlobalWindow } from '../utils/dom'
 
 /**
  * An object that contains information about the current device and environment.
@@ -62,7 +62,7 @@ if (typeof window !== 'undefined') {
 			}
 		}
 		updateSupportsP3()
-		p3mql.addEventListener('change', updateSupportsP3)
+		addMediaQueryChangeListener(p3mql, updateSupportsP3)
 	}
 }
 
@@ -80,7 +80,7 @@ if (typeof window !== 'undefined' && !isForcedFinePointer) {
 			}
 		}
 		updateIsCoarsePointer()
-		mql.addEventListener('change', updateIsCoarsePointer)
+		addMediaQueryChangeListener(mql, updateIsCoarsePointer)
 	}
 
 	// 2. Also update the coarse pointer state when a pointer down event occurs. We need `capture: true`
